@@ -1,5 +1,4 @@
 use clap::Parser;
-use rand::distributions::{Alphanumeric, DistString};
 use rand::Rng;
 use std::io::{self, BufRead};
 
