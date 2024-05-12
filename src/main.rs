@@ -1,5 +1,7 @@
 use clap::Parser;
 use rand::Rng;
+use std::fs::File;
+use std::io::prelude::*;
 use std::io::{self, BufRead};
 
 const CAPITAL_A_ASCII_CODE: u8 = 65;
@@ -64,7 +66,19 @@ impl Consonant for char {
     }
 }
 
-fn countdown_words() {
+fn populate_dictionary() {
+    let file = File::open("src/dictionary.txt");
+    let mut contents = String::new();
+    match file {
+        Ok(mut opened_file) => {
+            let _ = opened_file.read_to_string(&mut contents);
+            println!("{}", contents);
+        }
+        Err(failed) => println!("[FAILURE] failed to open file: {}", failed),
+    }
+}
+
+pub fn countdown_words() {
     println!("Welcome to Countdown Words!\n");
 
     let mut chosen_letters = String::new();
@@ -109,6 +123,8 @@ fn countdown_words() {
             }
         }
     }
+
+    populate_dictionary();
 }
 
 fn countdown_numbers() {
