@@ -34,13 +34,17 @@ fn main() {
             None => {}
             Some(succeed_option) => match succeed_option {
                 Ok(succeed) => {
-                    println!("[SUCCESS] {}", succeed);
+                    // TODO: maybe needs a better implementation
+                    if succeed.chars().all(|nums| nums.is_digit(10)) {
+                        println!("[SUCCESS] {}", succeed);
+                    } else {
+                        println!("[FAILURE] {}", succeed);
+                    }
                 }
                 Err(failed) => {
                     println!("[FAILURE] {}", failed);
                 }
             },
         }
-        // TODO: need to convert the input to numbers and match that to the game chosen by user
     }
 }
