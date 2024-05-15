@@ -66,13 +66,17 @@ impl Consonant for char {
     }
 }
 
-fn populate_dictionary() {
-    let file = File::open("src/dictionary.txt");
-    let mut contents = String::new();
+fn populate_dictionary<'a>(
+    dictionary: &'a mut Vec<&'a str>,
+    file: Result<File, std::io::Error>,
+    contents: &'a mut String,
+) {
     match file {
         Ok(mut opened_file) => {
-            let _ = opened_file.read_to_string(&mut contents);
-            println!("{}", contents);
+            let _ = opened_file.read_to_string(contents);
+            for word in contents.split_ascii_whitespace() {
+                dictionary.push(word);
+            }
         }
         Err(failed) => println!("[FAILURE] failed to open file: {}", failed),
     }
@@ -80,6 +84,12 @@ fn populate_dictionary() {
 
 pub fn countdown_words() {
     println!("Welcome to Countdown Words!\n");
+
+    println!("Populating dictionary...\n");
+    let mut dictionary: Vec<&str> = Vec::new();
+    let txt_file = File::open("src/dictionary.txt");
+    let mut contents = String::new();
+    populate_dictionary(&mut dictionary, txt_file, &mut contents);
 
     let mut chosen_letters = String::new();
     for _ in 0..9 {
@@ -123,8 +133,6 @@ pub fn countdown_words() {
             }
         }
     }
-
-    populate_dictionary();
 }
 
 fn countdown_numbers() {
@@ -138,7 +146,7 @@ fn main() {
         println!("Hello {}!", args.name);
         println!("Please choose what games do you want to play: ");
         show_game_choices();
-        // print!("Game: ");
+
         let user_input: Option<Result<String, std::io::Error>> = io::stdin().lock().lines().next();
         match user_input {
             None => println!("[FAILURE] failed to read user input"),
