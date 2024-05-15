@@ -3,6 +3,8 @@ use rand::Rng;
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::{self, BufRead};
+use std::time::Duration;
+use tokio::time::sleep;
 
 const CAPITAL_A_ASCII_CODE: u8 = 65;
 const CAPITAL_Z_ASCII_CODE: u8 = 90;
@@ -82,7 +84,7 @@ fn populate_dictionary<'a>(
     }
 }
 
-pub fn countdown_words() {
+pub async fn countdown_words() {
     println!("Welcome to Countdown Words!\n");
 
     println!("Populating dictionary...\n");
@@ -133,13 +135,39 @@ pub fn countdown_words() {
             }
         }
     }
+
+    println!("\nYour time starts now...");
+    let _ = sleep(Duration::from_millis(30000)).await;
+    println!("Pens down. 30s have elapsed\n");
+
+    println!("What's your answer?");
+    let user_input: Option<Result<String, std::io::Error>> = io::stdin().lock().lines().next();
+    match user_input {
+        None => println!("[FAILURE] failed to read user input"),
+        Some(succeed_option) => match succeed_option {
+            Ok(succeed) => {
+                println!("\nYour answer is: {}\n", succeed);
+                println!("Congrats! You get {} points\n", succeed.len());
+            }
+            Err(failed) => {
+                println!("[FAILURE] failed_option: {}", failed);
+            }
+        },
+    }
 }
 
-fn countdown_numbers() {
+pub async fn countdown_numbers() {
     println!("Welcome to Countdown Numbers!\n");
+
+    println!("Your time starts now...");
+    let _ = sleep(Duration::from_millis(30000)).await;
+    println!("Pens down. 30s have elapsed");
+
+    println!("What's your answer?");
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let args = Args::parse();
 
     for _ in 0..args.count {
@@ -167,8 +195,8 @@ fn main() {
                                 "[FAILURE] failed to convert user_input:char to user_input:u32"
                             ),
                             Some(chosen_game) => match chosen_game {
-                                1 => countdown_words(),
-                                2 => countdown_numbers(),
+                                1 => countdown_words().await,
+                                2 => countdown_numbers().await,
                                 otherwise => {
                                     println!(
                                         "[FAILURE] no games associated with that number: {}",
@@ -182,7 +210,7 @@ fn main() {
                     }
                 }
                 Err(failed) => {
-                    println!("[FAILURE] {}", failed);
+                    println!("[FAILURE] failed_option: {}", failed);
                 }
             },
         }
