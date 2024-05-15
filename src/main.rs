@@ -1,8 +1,10 @@
 use clap::Parser;
 use rand::Rng;
+use spinoff::{spinners, Color, Spinner};
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::{self, BufRead};
+// use std::thread::sleep;
 use std::time::Duration;
 use tokio::time::sleep;
 
@@ -84,6 +86,50 @@ fn populate_dictionary<'a>(
     }
 }
 
+// Heap's Algorithm: https://en.wikipedia.org/wiki/Heap%27s_algorithm
+pub async fn heaps_algorithm(n: usize, mut a: Vec<char>) {
+    // c is an encoding of the stack state. c[k] encodes the for-loop counter for when generate(k - 1, A) is called
+    let mut c: Vec<usize> = vec![0; n];
+
+    // output(A)
+    for ch in &a {
+        print!("{}", ch);
+    }
+    print!("\n");
+
+    // i acts similarly to a stack pointer
+    let mut i = 1;
+    while i < n {
+        if c[i] < i {
+            if i % 2 == 0 {
+                a.swap(0, i);
+            } else {
+                a.swap(c[i], i);
+            }
+
+            // output(A)
+            for ch in &a {
+                print!("{}", ch);
+            }
+            print!("\n");
+
+            // Swap has occurred ending the for-loop. Simulate the increment of the for-loop counter
+            c[i] += 1;
+            // Simulate recursive call reaching the base case by bringing the pointer to the base case analog in the array
+            i = 1;
+        } else {
+            // Calling generate(i+1, A) has ended as the for-loop terminated. Reset the state and simulate popping the stack by incrementing the pointer.
+            c[i] = 0;
+            i += 1
+        }
+    }
+
+    for ch in &a {
+        print!("Last: {}", ch);
+    }
+    print!("\n");
+}
+
 pub async fn countdown_words() {
     println!("Welcome to Countdown Words!\n");
 
@@ -136,9 +182,10 @@ pub async fn countdown_words() {
         }
     }
 
-    println!("\nYour time starts now...");
-    let _ = sleep(Duration::from_millis(30000)).await;
-    println!("Pens down. 30s have elapsed\n");
+    println!("\nYour time starts now!");
+    let mut thinking = Spinner::new(spinners::Dots, "Thinking...", Color::Blue);
+    let _ = sleep(Duration::from_secs(30));
+    thinking.success("Pens down! 30s have elapsed\n");
 
     println!("What's your answer?");
     let user_input: Option<Result<String, std::io::Error>> = io::stdin().lock().lines().next();
@@ -154,14 +201,24 @@ pub async fn countdown_words() {
             }
         },
     }
+
+    println!("Now...\n");
+
+    println!("Can you do better?");
+    println!("Let's ask Susie Rust\n");
+
+    let mut susie = Spinner::new(spinners::Dots, "Checking...", Color::Blue);
+    let _ = sleep(Duration::from_secs(5));
+    susie.success("You got the highest possible length\n");
 }
 
 pub async fn countdown_numbers() {
     println!("Welcome to Countdown Numbers!\n");
 
-    println!("Your time starts now...");
-    let _ = sleep(Duration::from_millis(30000)).await;
-    println!("Pens down. 30s have elapsed");
+    println!("Your time starts now!");
+    let mut spinner = Spinner::new(spinners::Dots, "Thinking...", Color::Blue);
+    let _ = sleep(Duration::from_secs(30));
+    spinner.success("Pens down! 30s have elapsed\n");
 
     println!("What's your answer?");
 }
@@ -197,6 +254,15 @@ async fn main() {
                             Some(chosen_game) => match chosen_game {
                                 1 => countdown_words().await,
                                 2 => countdown_numbers().await,
+                                3 => {
+                                    for _ in 0..9 {
+                                        heaps_algorithm(
+                                            9,
+                                            vec!['P', 'A', 'N', 'U', 'S', 'E', 'F', 'U', 'J'],
+                                        )
+                                        .await
+                                    }
+                                }
                                 otherwise => {
                                     println!(
                                         "[FAILURE] no games associated with that number: {}",
