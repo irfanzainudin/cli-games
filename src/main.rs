@@ -294,6 +294,26 @@ pub fn ttt_computer_move(board: &Vec<Vec<usize>>) -> (usize, usize) {
         }
     }
 
+    // Minimax algorithm
+    // - A recursive decision-making algorithm
+    // - Minimizes losing chances, maximising winning chances
+    // - Generates a "game tree" (a data structure possibly?)
+    // -- "Game tree" shows all possible moves and outcomes
+    // -- Looks ahead
+
+    // Components
+    // 1. Evaluation function
+    // 2. Maximising and minimising player
+
+    // 1. Eval fx
+    // - Assign a score to each possible board state
+    // - The scores are to quantify the favourable vs unfavourable outcomes
+
+    // Steps
+    // 1. Base Case
+    // 2. Recursive Exploration
+    // 3. Backtracking
+
     return (0, 0);
 }
 
